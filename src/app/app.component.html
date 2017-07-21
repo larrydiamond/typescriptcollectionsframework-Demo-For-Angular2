@@ -1,0 +1,10 @@
+<h1>
+  {{title}}
+</h1>
+
+<h2>Pet Store Products</h2>
+<li *ngFor="let product of petStoreProducts">
+  {{product.productName}} - {{product.price}}
+</li>
+
+<h2>Hey look at that *ngFor works on an Collection (implemented as an ArrayList)!</h2>
