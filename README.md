@@ -1,6 +1,8 @@
 # typescriptcollectionsframework-Demo-For-Angular2
 
-This is a demo project for the TypeScript Collections Framework so we can show off a working Angular2 project using the framework
+This is a demo project for the TypeScript Collections Framework ( https://github.com/larrydiamond/typescriptcollectionsframework , https://www.npmjs.com/package/typescriptcollectionsframework ) so we can show off a working Angular2 project using the framework
+
+This project uses version 0.3.2 of the TypeScript Collections Framework.
 
 This project was generated with [angular-cli](https://github.com/angular/angular-cli) version 1.0.0-beta.25.5.
 
