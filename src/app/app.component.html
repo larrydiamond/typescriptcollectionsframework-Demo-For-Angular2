@@ -1,12 +1,37 @@
-<h1>
-  {{title}}
-</h1>
+<a href="#" (click)="ArrayList()">ArrayList</a>&nbsp;
+<a href="#" (click)="LinkedList()">LinkedList</a>&nbsp;
+<a href="#" (click)="HashSet()">HashSet</a>&nbsp;
+<a href="#" (click)="TreeSet()">TreeSet</a>&nbsp;
+<br>
 
-<h2>Pet Store Products</h2>
-<li *ngFor="let product of petStoreProducts">
-  {{product.productName}} - {{product.price}}
-</li>
+<p *ngIf="active=='ArrayList'">
+  ArrayList<br>
+  <li *ngFor="let str of alData"><button (click)="removeArrayListEntry(str);">{{str}}</button></li>
+  <br>
+  <input #aladd type=text placeholder="add">
+  <button (click)="addArrayList(aladd.value);aladd.value=''">Add</button>
+</p>
 
-<h2>Hey look at that *ngFor works on an Collection (implemented as an ArrayList)!</h2>
+<p *ngIf="active=='LinkedList'">
+  LinkedList<br>
+  <li *ngFor="let str of llData"><button (click)="removeLinkedListEntry(str);">{{str}}</button></li>
+  <br>
+  <input #lladd type=text placeholder="add">
+  <button (click)="addLinkedList(lladd.value);lladd.value=''">Add</button>
+</p>
 
-<h2>This code running against v0.3.2 of the typescriptcollectionsframework</h2>
+<p *ngIf="active=='HashSet'">
+  HashSet<br>
+  <li *ngFor="let str of hsData"><button (click)="removeHashSetEntry(str);">{{str}}</button></li>
+  <br>
+  <input #hsadd type=text placeholder="add">
+  <button (click)="addHashSet(hsadd.value);hsadd.value=''">Add</button>
+</p>
+
+<p *ngIf="active=='TreeSet'">
+  TreeSet<br>
+  <li *ngFor="let str of tsData"><button (click)="removeTreeSetEntry(str);">{{str}}</button></li>
+  <br>
+  <input #tsadd type=text placeholder="add">
+  <button (click)="addTreeSet(tsadd.value);tsadd.value=''">Add</button>
+</p>
