@@ -60211,7 +60211,7 @@ var ArrayList = (function () {
       * @param {number} index index at which the specified element is to be inserted
       * @param {T} t element to be inserted
       */
-    ArrayList.prototype.addElement = function (index, t) {
+    ArrayList.prototype.addIndex = function (index, t) {
         if ((this.elements === null) || (this.elements === undefined)) {
             this.elements = new Array();
         }
@@ -60237,7 +60237,7 @@ var ArrayList = (function () {
         }
         for (var iter = c.iterator(); iter.hasNext();) {
             var t = iter.next();
-            this.addElement(index, t);
+            this.addIndex(index, t);
             index = index + 1;
         }
         return true;
@@ -60247,7 +60247,7 @@ var ArrayList = (function () {
      * @param {number} index the index of the element to be removed
      * @return {T} the element that was removed from the list, undefined if the element does not exist
      */
-    ArrayList.prototype.remove = function (index) {
+    ArrayList.prototype.removeIndex = function (index) {
         if ((this.elements === null) || (this.elements === undefined)) {
             return undefined;
         }
@@ -60320,7 +60320,7 @@ var ArrayList = (function () {
      * @param {T} t element to be removed from this list, if present
      * @return {T} true if this list contained the specified element
      */
-    ArrayList.prototype.removeElement = function (t) {
+    ArrayList.prototype.remove = function (t) {
         if ((this.elements === null) || (this.elements === undefined)) {
             return false;
         }
@@ -60328,7 +60328,7 @@ var ArrayList = (function () {
         if (offset === -1) {
             return false;
         }
-        this.remove(offset);
+        this.removeIndex(offset);
         return true;
     };
     /**
@@ -60346,7 +60346,7 @@ var ArrayList = (function () {
         var changed = false;
         for (var iter = c.iterator(); iter.hasNext();) {
             var t = iter.next();
-            var tmp = this.removeElement(t);
+            var tmp = this.remove(t);
             if (tmp === true)
                 changed = true;
         }
@@ -60631,7 +60631,7 @@ var HashMap = (function () {
         for (var loop = 0; loop < thisList.size(); loop++) {
             if (this.hashMethods.equals(key, thisList.get(loop).getKey())) {
                 this.elementCount = this.elementCount - 1;
-                return thisList.remove(loop).getValue();
+                return thisList.removeIndex(loop).getValue();
             }
         }
         return null;
@@ -61097,7 +61097,7 @@ var LinkedList = (function () {
      * @param {number} index index at which the specified element is to be inserted
      * @param {T} t element to be inserted
      */
-    LinkedList.prototype.addElement = function (index, t) {
+    LinkedList.prototype.addIndex = function (index, t) {
         if (index === 0) {
             var newnode = new LinkedListNode(t);
             newnode.nextNode = this.firstNode;
@@ -61193,7 +61193,7 @@ var LinkedList = (function () {
      * @param {T} t element to be removed from this list, if present
      * @return {T} true if this list contained the specified element
      */
-    LinkedList.prototype.removeElement = function (t) {
+    LinkedList.prototype.remove = function (t) {
         if ((this.firstNode === null) || (this.firstNode === undefined)) {
             return false;
         }
@@ -61240,7 +61240,7 @@ var LinkedList = (function () {
         var changed = false;
         for (var iter = c.iterator(); iter.hasNext();) {
             var t = iter.next();
-            var tmp = this.removeElement(t);
+            var tmp = this.remove(t);
             if (tmp === true)
                 changed = true;
         }
@@ -61265,7 +61265,7 @@ var LinkedList = (function () {
         }
         for (var iter = c.iterator(); iter.hasNext();) {
             var t = iter.next();
-            this.addElement(index, t);
+            this.addIndex(index, t);
             index = index + 1;
         }
         return true;
@@ -61300,7 +61300,7 @@ var LinkedList = (function () {
      * @param {number} index the index of the element to be removed
      * @return {T} the element that was removed from the list, undefined if the element does not exist
      */
-    LinkedList.prototype.remove = function (index) {
+    LinkedList.prototype.removeIndex = function (index) {
         if ((this.firstNode === null) || (this.firstNode === undefined)) {
             return undefined;
         }
@@ -61530,9 +61530,11 @@ var TreeMap = (function () {
           console.log ("top node is undefined");
           return;
         }
-        console.log ("New Tree: size = " + this.size());
+        console.log ("");
+        console.log ("Tree size = " + this.size());
         this.printMapNode (this.topNode);
         console.log ("End of Tree");
+        console.log ("");
       }
     
       private printMapNode (node:TreeMapNode<K,V>) : void {
@@ -61909,6 +61911,7 @@ var TreeMap = (function () {
                         parent.setRightNode(left);
                     }
                 }
+                left.setParentNode(parent);
                 var parentOfRight = tmp.getLeftNode();
                 while (parentOfRight.getRightNode() !== null)
                     parentOfRight = parentOfRight.getRightNode();
@@ -80661,7 +80664,7 @@ var HashSet = (function () {
         return false;
     };
     /**
-    * Removes the specified element from this set if it is present.
+    * RemoveElement the specified element from this set if it is present.
     * @param {K} element element to be removed from this set
     * @return {boolean} true if the set contained the specified element
     */
@@ -80898,6 +80901,17 @@ var TreeSet = (function () {
         return true;
     };
     /**
+     * Returns the greatest element in this set less than or equal to the given element, or null if there is no such element.
+     * @param {K} item to find floor node for
+     * @return {K} the greatest element less than or equal to e, or null if there is no such element
+     */
+    TreeSet.prototype.floor = function (item) {
+        var tmp = this.datastore.floorKey(item);
+        if (tmp === undefined)
+            return null;
+        return tmp;
+    };
+    /**
      * Returns the least element in this set greater than or equal to the given element, or null if there is no such element.
      * @param {K} item to find ceiling node for
      * @return {K} the least element greater than or equal to item, or null if there is no such element
@@ -80970,6 +80984,11 @@ var TreeSet = (function () {
     TreeSet.prototype.getNextHigherKey = function (key) {
         return this.datastore.getNextHigherKey(key);
     };
+    /*
+      public printSet () {
+        return this.datastore.printMap();
+      }
+    /* */
     /**
      * Returns a Java style iterator
      * @return {JIterator<K>} the Java style iterator

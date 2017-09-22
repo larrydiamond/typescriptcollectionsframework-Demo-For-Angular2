@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { ArrayList, LinkedList, HashSet, TreeSet, Hashable, GenericCollectable, GenericHashable, CollectionUtils, ImmutableCollection, JIterator } from 'typescriptcollectionsframework';
+import { JSet, ArrayList, LinkedList, HashSet, TreeSet, Hashable, GenericCollectable, GenericHashable, CollectionUtils, ImmutableCollection, JIterator } from 'typescriptcollectionsframework';
 
 @Component({
   selector: 'app-root',
@@ -26,10 +26,6 @@ export class AppComponent {
     this.hsData.add ("Cat");
     this.hsData.add ("Squirrel");
     this.hsData.add ("Dog");
-
-    for (let iter:JIterator<string> = this.hsData.iterator(); iter.hasNext(); ) {
-      console.log (iter.next());
-    }
 
     this.tsData.add ("Cat");
     this.tsData.add ("Squirrel");
@@ -65,16 +61,82 @@ export class AppComponent {
     this.tsData.add (newdata);
   }
   removeArrayListEntry(olddata:string) {
-    this.alData.removeElement(olddata);
+    this.alData.remove(olddata);
   }
   removeLinkedListEntry(olddata:string) {
-    this.llData.removeElement(olddata);
+    this.llData.remove(olddata);
   }
   removeHashSetEntry(olddata:string) {
     this.hsData.remove(olddata);
   }
   removeTreeSetEntry(olddata:string) {
     this.tsData.remove(olddata);
+  }
+
+  exercise (victim:JSet<string>) {
+    let control:ArrayList<string> = new ArrayList<string> (new GenericCollectable<string>(), victim);
+    let foundbug:boolean = false;
+    let numberofactions = 0;
+    while (foundbug === false) {
+      if (numberofactions >= 100000)
+        foundbug = true;
+      numberofactions = numberofactions + 1;
+      let offset:number = Math.floor (Math.random() * control.size());
+      let predelete:string = control.get (offset);
+
+      if (victim.contains (predelete) === false) {
+        console.log ("set was supposed to contain " + predelete);
+        foundbug = true;
+      } else {
+        control.removeIndex (offset);
+        let presize = victim.size ();
+        if (victim.remove (predelete) === false) {
+          console.log ("set could not remove " + predelete);
+          foundbug = true;
+        } else {
+          let loop:number = 0;
+          for (let iter:JIterator<string> = victim.iterator(); ((foundbug === false) && (iter.hasNext())); loop = loop + 1) {
+            let t:string = iter.next ();
+            if (loop > presize) {
+              foundbug = true;
+              console.log ("iterate forever post remove " + predelete);
+            }
+          }
+          let postsize = victim.size ();
+          if (postsize >= presize) {
+            foundbug = true;
+            console.log ("size is now " + postsize + " and was " + presize);
+          }
+
+          console.log ("removed " + predelete);
+
+          let c1:number = Math.floor (Math.random() * 26) + 1;
+          let c2:number = Math.floor (Math.random() * 26) + 1;
+          let c3:number = Math.floor (Math.random() * 26) + 1;
+          let c4:number = Math.floor (Math.random() * 26) + 1;
+          let c5:number = Math.floor (Math.random() * 26) + 1;
+
+          let added:boolean = false;
+          while (added === false) {
+            let add:string = String.fromCharCode (96 + c1) + String.fromCharCode (96 + c2) + String.fromCharCode (96 + c3) + String.fromCharCode (96 + c4) + String.fromCharCode (96 + c5);
+            if (victim.contains (add) === false) {
+              victim.add (add);
+              control.add (add);
+              added = true;
+              console.log ("added " + add + " " + numberofactions);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  exerciseHashSet() {
+    this.exercise (this.hsData);
+  }
+
+  exerciseTreeSet() {
+    this.exercise (this.tsData);
   }
 }
 

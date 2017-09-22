@@ -74,9 +74,6 @@ var AppComponent = (function () {
         this.hsData.add("Cat");
         this.hsData.add("Squirrel");
         this.hsData.add("Dog");
-        for (var iter = this.hsData.iterator(); iter.hasNext();) {
-            console.log(iter.next());
-        }
         this.tsData.add("Cat");
         this.tsData.add("Squirrel");
         this.tsData.add("Dog");
@@ -108,16 +105,77 @@ var AppComponent = (function () {
         this.tsData.add(newdata);
     };
     AppComponent.prototype.removeArrayListEntry = function (olddata) {
-        this.alData.removeElement(olddata);
+        this.alData.remove(olddata);
     };
     AppComponent.prototype.removeLinkedListEntry = function (olddata) {
-        this.llData.removeElement(olddata);
+        this.llData.remove(olddata);
     };
     AppComponent.prototype.removeHashSetEntry = function (olddata) {
         this.hsData.remove(olddata);
     };
     AppComponent.prototype.removeTreeSetEntry = function (olddata) {
         this.tsData.remove(olddata);
+    };
+    AppComponent.prototype.exercise = function (victim) {
+        var control = new __WEBPACK_IMPORTED_MODULE_1_typescriptcollectionsframework__["ArrayList"](new __WEBPACK_IMPORTED_MODULE_1_typescriptcollectionsframework__["GenericCollectable"](), victim);
+        var foundbug = false;
+        var numberofactions = 0;
+        while (foundbug === false) {
+            if (numberofactions >= 100000)
+                foundbug = true;
+            numberofactions = numberofactions + 1;
+            var offset = Math.floor(Math.random() * control.size());
+            var predelete = control.get(offset);
+            if (victim.contains(predelete) === false) {
+                console.log("set was supposed to contain " + predelete);
+                foundbug = true;
+            }
+            else {
+                control.removeIndex(offset);
+                var presize = victim.size();
+                if (victim.remove(predelete) === false) {
+                    console.log("set could not remove " + predelete);
+                    foundbug = true;
+                }
+                else {
+                    var loop = 0;
+                    for (var iter = victim.iterator(); ((foundbug === false) && (iter.hasNext())); loop = loop + 1) {
+                        var t = iter.next();
+                        if (loop > presize) {
+                            foundbug = true;
+                            console.log("iterate forever post remove " + predelete);
+                        }
+                    }
+                    var postsize = victim.size();
+                    if (postsize >= presize) {
+                        foundbug = true;
+                        console.log("size is now " + postsize + " and was " + presize);
+                    }
+                    console.log("removed " + predelete);
+                    var c1 = Math.floor(Math.random() * 26) + 1;
+                    var c2 = Math.floor(Math.random() * 26) + 1;
+                    var c3 = Math.floor(Math.random() * 26) + 1;
+                    var c4 = Math.floor(Math.random() * 26) + 1;
+                    var c5 = Math.floor(Math.random() * 26) + 1;
+                    var added = false;
+                    while (added === false) {
+                        var add = String.fromCharCode(96 + c1) + String.fromCharCode(96 + c2) + String.fromCharCode(96 + c3) + String.fromCharCode(96 + c4) + String.fromCharCode(96 + c5);
+                        if (victim.contains(add) === false) {
+                            victim.add(add);
+                            control.add(add);
+                            added = true;
+                            console.log("added " + add + " " + numberofactions);
+                        }
+                    }
+                }
+            }
+        }
+    };
+    AppComponent.prototype.exerciseHashSet = function () {
+        this.exercise(this.hsData);
+    };
+    AppComponent.prototype.exerciseTreeSet = function () {
+        this.exercise(this.tsData);
     };
     AppComponent = __decorate([
         __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__angular_core__["U" /* Component */])({
