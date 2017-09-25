@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { JSet, ArrayList, LinkedList, HashSet, TreeSet, Hashable, GenericCollectable, GenericHashable, CollectionUtils, ImmutableCollection, JIterator } from 'typescriptcollectionsframework';
+import { JSet, ArrayList, LinkedList, HashSet, TreeSet, Hashable, AllFieldCollectable, AllFieldHashable, Collections, ImmutableCollection, JIterator } from 'typescriptcollectionsframework';
 
 @Component({
   selector: 'app-root',
@@ -9,10 +9,10 @@ import { JSet, ArrayList, LinkedList, HashSet, TreeSet, Hashable, GenericCollect
 export class AppComponent {
   active:string = "ArrayList";
 
-  alData:ArrayList<string> = new ArrayList<string>(new GenericCollectable<string>());
-  llData:LinkedList<string> = new LinkedList<string>(new GenericCollectable<string>());
-  hsData:HashSet<string> = new HashSet<string>(new GenericHashable<string>());
-  tsData:TreeSet<string> = new TreeSet<string>(CollectionUtils.getStringComparator());
+  alData:ArrayList<string> = new ArrayList<string>(new AllFieldCollectable<string>());
+  llData:LinkedList<string> = new LinkedList<string>(new AllFieldCollectable<string>());
+  hsData:HashSet<string> = new HashSet<string>(new AllFieldHashable<string>());
+  tsData:TreeSet<string> = new TreeSet<string>(Collections.getStringComparator());
 
   constructor () {
     this.alData.add ("Cat");
@@ -74,7 +74,7 @@ export class AppComponent {
   }
 
   exercise (victim:JSet<string>) {
-    let control:ArrayList<string> = new ArrayList<string> (new GenericCollectable<string>(), victim);
+    let control:ArrayList<string> = new ArrayList<string> (new AllFieldCollectable<string>(), victim);
     let foundbug:boolean = false;
     let numberofactions = 0;
     while (foundbug === false) {

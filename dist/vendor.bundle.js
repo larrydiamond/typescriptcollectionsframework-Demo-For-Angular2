@@ -41959,130 +41959,286 @@ exports.$$rxSubscriber = exports.rxSubscriber;
 
 "use strict";
 
+/**
+ * @license
+ * Copyright Larry Diamond 2017 All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/larrydiamond/typescriptcollectionsframework/LICENSE
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
-var CollectionUtils = (function () {
-    function CollectionUtils() {
-    }
-    CollectionUtils.getStringComparator = function () {
-        var sortString = {
-            compare: function (o1, o2) {
-                if (o1 === o2)
-                    return 0;
-                if (o1 === undefined)
-                    return -1;
-                if (o1 === null)
-                    return -1;
-                if (o2 === undefined)
-                    return 1;
-                if (o2 === null)
-                    return 1;
-                if (o1 < o2)
-                    return -1;
-                return 1;
-            }
-        };
-        return sortString;
-    };
-    CollectionUtils.getNumberComparator = function () {
-        var sortNumber = {
-            compare: function (o1, o2) {
-                if (o1 === o2)
-                    return 0;
-                if (o1 === undefined)
-                    return -1;
-                if (o1 === null)
-                    return -1;
-                if (o2 === undefined)
-                    return 1;
-                if (o2 === null)
-                    return 1;
-                if (o1 < o2)
-                    return -1;
-                return 1;
-            }
-        };
-        return sortNumber;
-    };
-    return CollectionUtils;
-}());
-exports.CollectionUtils = CollectionUtils;
-var GenericCollectable = (function () {
-    function GenericCollectable() {
-    }
-    GenericCollectable.prototype.equals = function (o1, o2) {
-        if (o1 === undefined) {
-            if (o2 === undefined) {
-                return true;
-            }
-            else {
-                return false;
+var BasicIteratorResult_1 = __webpack_require__(75);
+var ArrayList = (function () {
+    function ArrayList(iEquals, initialElements) {
+        this.initialElements = initialElements;
+        this.elements = null;
+        this.sizeValue = 0;
+        this.equality = iEquals;
+        if ((initialElements !== null) && (initialElements !== undefined)) {
+            for (var iter = initialElements.iterator(); iter.hasNext();) {
+                var t = iter.next();
+                this.add(t);
             }
         }
-        if (o1 === null) {
-            if (o2 === null) {
-                return true;
-            }
-            else {
-                return false;
-            }
+    }
+    /**
+    * Returns the Collectible
+    * @return {Collectable}
+    */
+    ArrayList.prototype.getCollectable = function () {
+        return this.equality;
+    };
+    /**
+    * Appends the specified element to the end of this list
+    * @param {T} t element to Append
+    * @return {boolean} true if this collection changed as a result of the call
+    */
+    ArrayList.prototype.add = function (t) {
+        if ((this.elements === null) || (this.elements === undefined)) {
+            this.elements = new Array();
         }
-        if ((o2 === null) || (o2 === undefined)) {
+        this.elements.push(t);
+        this.sizeValue = this.sizeValue + 1;
+        return true;
+    };
+    /**
+      * Inserts the specified element at the specified position in this list. Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices).
+      * @param {number} index index at which the specified element is to be inserted
+      * @param {T} t element to be inserted
+      */
+    ArrayList.prototype.addIndex = function (index, t) {
+        if ((this.elements === null) || (this.elements === undefined)) {
+            this.elements = new Array();
+        }
+        this.elements.splice(index, 0, t);
+        this.sizeValue = this.sizeValue + 1;
+    };
+    /**
+     * Inserts all of the elements in the specified collection into this list, starting at the specified position. Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices). The new elements will appear in the list in the order that they are returned by the specified collection's iterator.
+     * @param {number} index index at which to insert the first element from the specified collection
+     * @param {Collection} c collection containing elements to be added to this list
+     * @return {boolean} true if this collection changed as a result of the call
+     */
+    ArrayList.prototype.addAll = function (c, index) {
+        if (c === null)
+            return false;
+        if (c === undefined)
+            return false;
+        if (c.size() < 1)
+            return false;
+        var offsetToStartAt = this.size();
+        if (index) {
+            offsetToStartAt = index;
+        }
+        for (var iter = c.iterator(); iter.hasNext();) {
+            var t = iter.next();
+            this.addIndex(index, t);
+            index = index + 1;
+        }
+        return true;
+    };
+    /**
+     * Removes the element at the specified position in this list. Shifts any subsequent elements to the left (subtracts one from their indices).
+     * @param {number} index the index of the element to be removed
+     * @return {T} the element that was removed from the list, undefined if the element does not exist
+     */
+    ArrayList.prototype.removeIndex = function (index) {
+        if ((this.elements === null) || (this.elements === undefined)) {
+            return undefined;
+        }
+        var element = this.elements[index];
+        this.elements.splice(index, 1);
+        this.sizeValue = this.sizeValue - 1;
+        return element;
+    };
+    /**
+     * Removes all of the elements from this list. The list will be empty after this call returns.
+     */
+    ArrayList.prototype.clear = function () {
+        this.elements = new Array();
+        this.sizeValue = 0;
+    };
+    /**
+     * Returns the element at the specified position in this list.
+     * @param {number} index index of the element to return
+     * @return {T} the element at the specified position in this list
+     */
+    ArrayList.prototype.get = function (index) {
+        return this.elements[index];
+    };
+    /**
+     * Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element.
+     * @param {T} t element to search for
+     * @return {number} the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element
+     */
+    ArrayList.prototype.indexOf = function (t) {
+        if ((this.elements === null) || (this.elements === undefined))
+            return -1;
+        if (this.sizeValue <= 0)
+            return -1;
+        for (var loop = 0; loop < this.sizeValue; loop++) {
+            var e = this.get(loop);
+            if (this.equality.equals(e, t))
+                return loop;
+        }
+        return -1;
+    };
+    /**
+     * Returns the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
+     * @param {T} t element to search for
+     * @return {number} the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
+     */
+    ArrayList.prototype.lastIndexOf = function (t) {
+        if ((this.elements === null) || (this.elements === undefined))
+            return -1;
+        if (this.sizeValue <= 0)
+            return -1;
+        for (var loop = this.sizeValue - 1; loop >= 0; loop--) {
+            var e = this.get(loop);
+            if (this.equality.equals(e, t))
+                return loop;
+        }
+        return -1;
+    };
+    /**
+     * Returns true if this list contains the specified element.
+     * @param {T} t element whose presence in this list is to be tested
+     * @return {boolean} true if this list contains the specified element
+     */
+    ArrayList.prototype.contains = function (t) {
+        if (this.indexOf(t) === -1)
+            return false;
+        return true;
+    };
+    /**
+     * Removes the first occurrence of the specified element from this list, if it is present. If the list does not contain the element, it is unchanged. More formally, removes the element with the lowest index i such that (o==null ? get(i)==null : o.equals(get(i))) (if such an element exists). Returns true if this list contained the specified element (or equivalently, if this list changed as a result of the call).
+     * @param {T} t element to be removed from this list, if present
+     * @return {T} true if this list contained the specified element
+     */
+    ArrayList.prototype.remove = function (t) {
+        if ((this.elements === null) || (this.elements === undefined)) {
             return false;
         }
-        if (JSON.stringify(o1) === JSON.stringify(o2))
+        var offset = this.indexOf(t);
+        if (offset === -1) {
+            return false;
+        }
+        this.removeIndex(offset);
+        return true;
+    };
+    /**
+     * Removes from this list all of its elements that are contained in the specified collection.
+     * @param {Collection} c collection containing elements to be removed from this list
+     * @return {boolean} true if this list changed as a result of the call
+     */
+    ArrayList.prototype.removeAll = function (c) {
+        if (c === null)
+            return false;
+        if (c === undefined)
+            return false;
+        if (c.size() < 1)
+            return false;
+        var changed = false;
+        for (var iter = c.iterator(); iter.hasNext();) {
+            var t = iter.next();
+            var tmp = this.remove(t);
+            if (tmp === true)
+                changed = true;
+        }
+        return changed;
+    };
+    /**
+     * Returns true if this list contains no elements.
+     * @return {boolean} true if this list contains no elements
+     */
+    ArrayList.prototype.isEmpty = function () {
+        if (this.sizeValue === 0)
             return true;
         return false;
     };
-    return GenericCollectable;
+    /**
+     * Replaces the element at the specified position in this list with the specified element.
+     * @param {number} index index of the element to replace
+     * @param {T} element element to be stored at the specified position
+     * @return {number} the element previously at the specified position
+     */
+    ArrayList.prototype.set = function (index, element) {
+        var tmp = this.elements[index];
+        this.elements[index] = element;
+        return tmp;
+    };
+    /**
+     * Returns the number of elements in this list.
+     * @return {number} the number of elements in this list
+     */
+    ArrayList.prototype.size = function () {
+        return this.sizeValue;
+    };
+    /**
+     * Returns a Java style iterator
+     * @return {JIterator<T>} the Java style iterator
+     */
+    ArrayList.prototype.iterator = function () {
+        return new ArrayListJIterator(this);
+    };
+    /**
+     * Returns a TypeScript style iterator
+     * @return {Iterator<T>} the TypeScript style iterator
+     */
+    ArrayList.prototype[Symbol.iterator] = function () {
+        return new ArrayListIterator(this);
+    };
+    /**
+    * Returns an ImmutableList backed by this List
+    */
+    ArrayList.prototype.immutableList = function () {
+        return this;
+    };
+    ;
+    /**
+    * Returns an ImmutableCollection backed by this Collection
+    */
+    ArrayList.prototype.immutableCollection = function () {
+        return this;
+    };
+    ;
+    return ArrayList;
 }());
-exports.GenericCollectable = GenericCollectable;
-var GenericHashable = (function () {
-    function GenericHashable() {
+exports.ArrayList = ArrayList;
+/* Java style iterator */
+var ArrayListJIterator = (function () {
+    function ArrayListJIterator(iArrayList) {
+        this.offset = 0;
+        this.arraylist = iArrayList;
     }
-    GenericHashable.prototype.equals = function (o1, o2) {
-        if (o1 === undefined) {
-            if (o2 === undefined) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if (o1 === null) {
-            if (o2 === null) {
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        if ((o2 === null) || (o2 === undefined)) {
-            return false;
-        }
-        if (JSON.stringify(o1) === JSON.stringify(o2))
+    ArrayListJIterator.prototype.hasNext = function () {
+        if (this.offset < this.arraylist.size())
             return true;
         return false;
     };
-    ;
-    GenericHashable.prototype.hashCode = function (o) {
-        if (o === undefined) {
-            return 0;
-        }
-        if (o === null) {
-            return 0;
-        }
-        var tmp = JSON.stringify(o);
-        var hash = 0;
-        for (var loop = 0; loop < tmp.length; loop++) {
-            var n = tmp.charCodeAt(loop);
-            hash = ((hash * 256) + n) % 1000000000;
-        }
-        return hash;
+    ArrayListJIterator.prototype.next = function () {
+        return this.arraylist.get(this.offset++);
     };
-    ;
-    return GenericHashable;
+    return ArrayListJIterator;
 }());
-exports.GenericHashable = GenericHashable;
+exports.ArrayListJIterator = ArrayListJIterator;
+/* TypeScript iterator */
+var ArrayListIterator = (function () {
+    function ArrayListIterator(iArrayList) {
+        this.offset = 0;
+        this.arraylist = iArrayList;
+    }
+    ArrayListIterator.prototype.next = function (value) {
+        if (this.offset < this.arraylist.size()) {
+            return new BasicIteratorResult_1.BasicIteratorResult(false, this.arraylist.get(this.offset++));
+        }
+        else {
+            return new BasicIteratorResult_1.BasicIteratorResult(true, null);
+        }
+    };
+    return ArrayListIterator;
+}());
+exports.ArrayListIterator = ArrayListIterator;
 
 
 /***/ },
@@ -60172,264 +60328,36 @@ exports.isFunction = isFunction;
  * found in the LICENSE file at https://github.com/larrydiamond/typescriptcollectionsframework/LICENSE
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var BasicIteratorResult_1 = __webpack_require__(75);
-var ArrayList = (function () {
-    function ArrayList(iEquals, initialElements) {
-        this.initialElements = initialElements;
-        this.elements = null;
-        this.sizeValue = 0;
-        this.equality = iEquals;
-        if ((initialElements !== null) && (initialElements !== undefined)) {
-            for (var iter = initialElements.iterator(); iter.hasNext();) {
-                var t = iter.next();
-                this.add(t);
+var AllFieldCollectable = (function () {
+    function AllFieldCollectable() {
+    }
+    AllFieldCollectable.prototype.equals = function (o1, o2) {
+        if (o1 === undefined) {
+            if (o2 === undefined) {
+                return true;
+            }
+            else {
+                return false;
             }
         }
-    }
-    /**
-    * Returns the Collectible
-    * @return {Collectable}
-    */
-    ArrayList.prototype.getCollectable = function () {
-        return this.equality;
-    };
-    /**
-    * Appends the specified element to the end of this list
-    * @param {T} t element to Append
-    * @return {boolean} true if this collection changed as a result of the call
-    */
-    ArrayList.prototype.add = function (t) {
-        if ((this.elements === null) || (this.elements === undefined)) {
-            this.elements = new Array();
+        if (o1 === null) {
+            if (o2 === null) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
-        this.elements.push(t);
-        this.sizeValue = this.sizeValue + 1;
-        return true;
-    };
-    /**
-      * Inserts the specified element at the specified position in this list. Shifts the element currently at that position (if any) and any subsequent elements to the right (adds one to their indices).
-      * @param {number} index index at which the specified element is to be inserted
-      * @param {T} t element to be inserted
-      */
-    ArrayList.prototype.addIndex = function (index, t) {
-        if ((this.elements === null) || (this.elements === undefined)) {
-            this.elements = new Array();
-        }
-        this.elements.splice(index, 0, t);
-        this.sizeValue = this.sizeValue + 1;
-    };
-    /**
-     * Inserts all of the elements in the specified collection into this list, starting at the specified position. Shifts the element currently at that position (if any) and any subsequent elements to the right (increases their indices). The new elements will appear in the list in the order that they are returned by the specified collection's iterator.
-     * @param {number} index index at which to insert the first element from the specified collection
-     * @param {Collection} c collection containing elements to be added to this list
-     * @return {boolean} true if this collection changed as a result of the call
-     */
-    ArrayList.prototype.addAll = function (c, index) {
-        if (c === null)
-            return false;
-        if (c === undefined)
-            return false;
-        if (c.size() < 1)
-            return false;
-        var offsetToStartAt = this.size();
-        if (index) {
-            offsetToStartAt = index;
-        }
-        for (var iter = c.iterator(); iter.hasNext();) {
-            var t = iter.next();
-            this.addIndex(index, t);
-            index = index + 1;
-        }
-        return true;
-    };
-    /**
-     * Removes the element at the specified position in this list. Shifts any subsequent elements to the left (subtracts one from their indices).
-     * @param {number} index the index of the element to be removed
-     * @return {T} the element that was removed from the list, undefined if the element does not exist
-     */
-    ArrayList.prototype.removeIndex = function (index) {
-        if ((this.elements === null) || (this.elements === undefined)) {
-            return undefined;
-        }
-        var element = this.elements[index];
-        this.elements.splice(index, 1);
-        this.sizeValue = this.sizeValue - 1;
-        return element;
-    };
-    /**
-     * Removes all of the elements from this list. The list will be empty after this call returns.
-     */
-    ArrayList.prototype.clear = function () {
-        this.elements = new Array();
-        this.sizeValue = 0;
-    };
-    /**
-     * Returns the element at the specified position in this list.
-     * @param {number} index index of the element to return
-     * @return {T} the element at the specified position in this list
-     */
-    ArrayList.prototype.get = function (index) {
-        return this.elements[index];
-    };
-    /**
-     * Returns the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element.
-     * @param {T} t element to search for
-     * @return {number} the index of the first occurrence of the specified element in this list, or -1 if this list does not contain the element
-     */
-    ArrayList.prototype.indexOf = function (t) {
-        if ((this.elements === null) || (this.elements === undefined))
-            return -1;
-        if (this.sizeValue <= 0)
-            return -1;
-        for (var loop = 0; loop < this.sizeValue; loop++) {
-            var e = this.get(loop);
-            if (this.equality.equals(e, t))
-                return loop;
-        }
-        return -1;
-    };
-    /**
-     * Returns the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
-     * @param {T} t element to search for
-     * @return {number} the index of the last occurrence of the specified element in this list, or -1 if this list does not contain the element
-     */
-    ArrayList.prototype.lastIndexOf = function (t) {
-        if ((this.elements === null) || (this.elements === undefined))
-            return -1;
-        if (this.sizeValue <= 0)
-            return -1;
-        for (var loop = this.sizeValue - 1; loop >= 0; loop--) {
-            var e = this.get(loop);
-            if (this.equality.equals(e, t))
-                return loop;
-        }
-        return -1;
-    };
-    /**
-     * Returns true if this list contains the specified element.
-     * @param {T} t element whose presence in this list is to be tested
-     * @return {boolean} true if this list contains the specified element
-     */
-    ArrayList.prototype.contains = function (t) {
-        if (this.indexOf(t) === -1)
-            return false;
-        return true;
-    };
-    /**
-     * Removes the first occurrence of the specified element from this list, if it is present. If the list does not contain the element, it is unchanged. More formally, removes the element with the lowest index i such that (o==null ? get(i)==null : o.equals(get(i))) (if such an element exists). Returns true if this list contained the specified element (or equivalently, if this list changed as a result of the call).
-     * @param {T} t element to be removed from this list, if present
-     * @return {T} true if this list contained the specified element
-     */
-    ArrayList.prototype.remove = function (t) {
-        if ((this.elements === null) || (this.elements === undefined)) {
+        if ((o2 === null) || (o2 === undefined)) {
             return false;
         }
-        var offset = this.indexOf(t);
-        if (offset === -1) {
-            return false;
-        }
-        this.removeIndex(offset);
-        return true;
-    };
-    /**
-     * Removes from this list all of its elements that are contained in the specified collection.
-     * @param {Collection} c collection containing elements to be removed from this list
-     * @return {boolean} true if this list changed as a result of the call
-     */
-    ArrayList.prototype.removeAll = function (c) {
-        if (c === null)
-            return false;
-        if (c === undefined)
-            return false;
-        if (c.size() < 1)
-            return false;
-        var changed = false;
-        for (var iter = c.iterator(); iter.hasNext();) {
-            var t = iter.next();
-            var tmp = this.remove(t);
-            if (tmp === true)
-                changed = true;
-        }
-        return changed;
-    };
-    /**
-     * Returns true if this list contains no elements.
-     * @return {boolean} true if this list contains no elements
-     */
-    ArrayList.prototype.isEmpty = function () {
-        if (this.sizeValue === 0)
+        if (JSON.stringify(o1) === JSON.stringify(o2))
             return true;
         return false;
     };
-    /**
-     * Replaces the element at the specified position in this list with the specified element.
-     * @param {number} index index of the element to replace
-     * @param {T} element element to be stored at the specified position
-     * @return {number} the element previously at the specified position
-     */
-    ArrayList.prototype.set = function (index, element) {
-        var tmp = this.elements[index];
-        this.elements[index] = element;
-        return tmp;
-    };
-    /**
-     * Returns the number of elements in this list.
-     * @return {number} the number of elements in this list
-     */
-    ArrayList.prototype.size = function () {
-        return this.sizeValue;
-    };
-    /**
-     * Returns a Java style iterator
-     * @return {JIterator<T>} the Java style iterator
-     */
-    ArrayList.prototype.iterator = function () {
-        return new ArrayListJIterator(this);
-    };
-    /**
-     * Returns a TypeScript style iterator
-     * @return {Iterator<T>} the TypeScript style iterator
-     */
-    ArrayList.prototype[Symbol.iterator] = function () {
-        return new ArrayListIterator(this);
-    };
-    return ArrayList;
+    return AllFieldCollectable;
 }());
-exports.ArrayList = ArrayList;
-/* Java style iterator */
-var ArrayListJIterator = (function () {
-    function ArrayListJIterator(iArrayList) {
-        this.offset = 0;
-        this.arraylist = iArrayList;
-    }
-    ArrayListJIterator.prototype.hasNext = function () {
-        if (this.offset < this.arraylist.size())
-            return true;
-        return false;
-    };
-    ArrayListJIterator.prototype.next = function () {
-        return this.arraylist.get(this.offset++);
-    };
-    return ArrayListJIterator;
-}());
-exports.ArrayListJIterator = ArrayListJIterator;
-/* TypeScript iterator */
-var ArrayListIterator = (function () {
-    function ArrayListIterator(iArrayList) {
-        this.offset = 0;
-        this.arraylist = iArrayList;
-    }
-    ArrayListIterator.prototype.next = function (value) {
-        if (this.offset < this.arraylist.size()) {
-            return new BasicIteratorResult_1.BasicIteratorResult(false, this.arraylist.get(this.offset++));
-        }
-        else {
-            return new BasicIteratorResult_1.BasicIteratorResult(true, null);
-        }
-    };
-    return ArrayListIterator;
-}());
-exports.ArrayListIterator = ArrayListIterator;
+exports.AllFieldCollectable = AllFieldCollectable;
 
 
 /***/ },
@@ -60494,7 +60422,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayList_1 = __webpack_require__(344);
+var ArrayList_1 = __webpack_require__(220);
 var BasicIteratorResult_1 = __webpack_require__(75);
 var BasicMapEntry_1 = __webpack_require__(345);
 var LinkedList_1 = __webpack_require__(347);
@@ -60697,6 +60625,13 @@ var HashMap = (function () {
     HashMap.prototype.entrySet = function () {
         return new ImmutableEntrySetForHashMap(this);
     };
+    /**
+    * Returns an ImmutableMap backed by Map
+    */
+    HashMap.prototype.immutableMap = function () {
+        return this;
+    };
+    ;
     /**
      * This method is deprecated and will be removed in a future revision.
      * @deprecated
@@ -61438,6 +61373,20 @@ var LinkedList = (function () {
     LinkedList.prototype[Symbol.iterator] = function () {
         return new LinkedListIterator(this);
     };
+    /**
+    * Returns an ImmutableList backed by this List
+    */
+    LinkedList.prototype.immutableList = function () {
+        return this;
+    };
+    ;
+    /**
+    * Returns an ImmutableCollection backed by this Collection
+    */
+    LinkedList.prototype.immutableCollection = function () {
+        return this;
+    };
+    ;
     return LinkedList;
 }());
 exports.LinkedList = LinkedList;
@@ -62236,6 +62185,13 @@ var TreeMap = (function () {
     TreeMap.prototype.entrySet = function () {
         return new ImmutableEntrySetForTreeMap(this);
     };
+    /**
+    * Returns an ImmutableMap backed by Map
+    */
+    TreeMap.prototype.immutableMap = function () {
+        return this;
+    };
+    ;
     return TreeMap;
 }());
 exports.TreeMap = TreeMap;
@@ -80590,28 +80546,223 @@ exports.tryCatch = tryCatch;
  * found in the LICENSE file at https://github.com/larrydiamond/typescriptcollectionsframework/LICENSE
  */
 Object.defineProperty(exports, "__esModule", { value: true });
-var ArrayList_1 = __webpack_require__(344);
+var AllFieldCollectable_1 = __webpack_require__(344);
+exports.AllFieldCollectable = AllFieldCollectable_1.AllFieldCollectable;
+var AllFieldHashable_1 = __webpack_require__(626);
+exports.AllFieldHashable = AllFieldHashable_1.AllFieldHashable;
+var ArrayList_1 = __webpack_require__(220);
 exports.ArrayList = ArrayList_1.ArrayList;
-var CollectionUtils_1 = __webpack_require__(220);
-exports.CollectionUtils = CollectionUtils_1.CollectionUtils;
-var CollectionUtils_2 = __webpack_require__(220);
-exports.GenericCollectable = CollectionUtils_2.GenericCollectable;
-var CollectionUtils_3 = __webpack_require__(220);
-exports.GenericHashable = CollectionUtils_3.GenericHashable;
+var Collections_1 = __webpack_require__(627);
+exports.Collections = Collections_1.Collections;
 var HashMap_1 = __webpack_require__(346);
 exports.HashMap = HashMap_1.HashMap;
-var HashSet_1 = __webpack_require__(626);
+var HashSet_1 = __webpack_require__(628);
 exports.HashSet = HashSet_1.HashSet;
 var LinkedList_1 = __webpack_require__(347);
 exports.LinkedList = LinkedList_1.LinkedList;
+var PriorityQueue_1 = __webpack_require__(629);
+exports.PriorityQueue = PriorityQueue_1.PriorityQueue;
 var TreeMap_1 = __webpack_require__(348);
 exports.TreeMap = TreeMap_1.TreeMap;
-var TreeSet_1 = __webpack_require__(627);
+var TreeSet_1 = __webpack_require__(630);
 exports.TreeSet = TreeSet_1.TreeSet;
 
 
 /***/ },
 /* 626 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @license
+ * Copyright Larry Diamond 2017 All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/larrydiamond/typescriptcollectionsframework/LICENSE
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+var AllFieldHashable = (function () {
+    function AllFieldHashable() {
+    }
+    AllFieldHashable.prototype.equals = function (o1, o2) {
+        if (o1 === undefined) {
+            if (o2 === undefined) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        if (o1 === null) {
+            if (o2 === null) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        if ((o2 === null) || (o2 === undefined)) {
+            return false;
+        }
+        if (JSON.stringify(o1) === JSON.stringify(o2))
+            return true;
+        return false;
+    };
+    ;
+    AllFieldHashable.prototype.hashCode = function (o) {
+        if (o === undefined) {
+            return 0;
+        }
+        if (o === null) {
+            return 0;
+        }
+        var tmp = JSON.stringify(o);
+        var hash = 0;
+        for (var loop = 0; loop < tmp.length; loop++) {
+            var n = tmp.charCodeAt(loop);
+            hash = ((hash * 256) + n) % 1000000000;
+        }
+        return hash;
+    };
+    ;
+    return AllFieldHashable;
+}());
+exports.AllFieldHashable = AllFieldHashable;
+
+
+/***/ },
+/* 627 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+ * @license
+ * Copyright Larry Diamond 2017 All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://github.com/larrydiamond/typescriptcollectionsframework/LICENSE
+ */
+Object.defineProperty(exports, "__esModule", { value: true });
+var AllFieldCollectable_1 = __webpack_require__(344);
+var ArrayList_1 = __webpack_require__(220);
+var Collections = (function () {
+    function Collections() {
+    }
+    Collections.getStringComparator = function () {
+        var sortString = {
+            compare: function (o1, o2) {
+                if (o1 === o2)
+                    return 0;
+                if (o1 === undefined)
+                    return -1;
+                if (o1 === null)
+                    return -1;
+                if (o2 === undefined)
+                    return 1;
+                if (o2 === null)
+                    return 1;
+                if (o1 < o2)
+                    return -1;
+                return 1;
+            }
+        };
+        return sortString;
+    };
+    Collections.getNumberComparator = function () {
+        var sortNumber = {
+            compare: function (o1, o2) {
+                if (o1 === o2)
+                    return 0;
+                if (o1 === undefined)
+                    return -1;
+                if (o1 === null)
+                    return -1;
+                if (o2 === undefined)
+                    return 1;
+                if (o2 === null)
+                    return 1;
+                if (o1 < o2)
+                    return -1;
+                return 1;
+            }
+        };
+        return sortNumber;
+    };
+    Collections.prototype.getHashCodeForString = function (o) {
+        if (o === undefined) {
+            return 0;
+        }
+        if (o === null) {
+            return 0;
+        }
+        var tmp = JSON.stringify(o);
+        var hash = 0;
+        for (var loop = 0; loop < tmp.length; loop++) {
+            var n = tmp.charCodeAt(loop);
+            hash = ((hash * 256) + n) % 1000000000;
+        }
+        return hash;
+    };
+    Collections.prototype.getHashCodeForStrings = function (o) {
+        if (o === undefined) {
+            return 0;
+        }
+        if (o === null) {
+            return 0;
+        }
+        var tmp = 0;
+        for (var iter = o.iterator(); iter.hasNext();) {
+            var ostr = iter.next();
+            tmp = ((tmp * 256) + this.getHashCodeForString(ostr)) % 1000000000;
+        }
+        return tmp;
+    };
+    Collections.prototype.getHashCodeForNumber = function (o) {
+        if (o === undefined) {
+            return 0;
+        }
+        if (o === null) {
+            return 0;
+        }
+        var tmp = o;
+        while ((tmp < 1000000000) && (Math.floor(tmp) !== tmp)) {
+            tmp = tmp * 10;
+        }
+        return tmp;
+    };
+    Collections.prototype.stringList = function () {
+        var values = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            values[_i] = arguments[_i];
+        }
+        var list = new ArrayList_1.ArrayList(new AllFieldCollectable_1.AllFieldCollectable());
+        for (var loop = 0; loop < values.length; loop++) {
+            var tmp = values[loop];
+            list.add(tmp);
+        }
+        return list.immutableList();
+    };
+    Collections.prototype.numberList = function () {
+        var values = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            values[_i] = arguments[_i];
+        }
+        var list = new ArrayList_1.ArrayList(new AllFieldCollectable_1.AllFieldCollectable());
+        for (var loop = 0; loop < values.length; loop++) {
+            var tmp = values[loop];
+            list.add(tmp);
+        }
+        return list.immutableList();
+    };
+    return Collections;
+}());
+exports.Collections = Collections;
+
+
+/***/ },
+/* 628 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -80741,6 +80892,20 @@ var HashSet = (function () {
     HashSet.prototype[Symbol.iterator] = function () {
         return new HashSetIterator(this);
     };
+    /**
+    * Returns an ImmutableCollection backed by this Collection
+    */
+    HashSet.prototype.immutableCollection = function () {
+        return this;
+    };
+    ;
+    /**
+    * Returns an ImmutableSet backed by this Set
+    */
+    HashSet.prototype.immutableSet = function () {
+        return this;
+    };
+    ;
     return HashSet;
 }());
 exports.HashSet = HashSet;
@@ -80819,7 +80984,123 @@ exports.HashSetIterator = HashSetIterator;
 
 
 /***/ },
-/* 627 */
+/* 629 */
+/***/ function(module, exports, __webpack_require__) {
+
+"use strict";
+
+/**
+* @license
+* Copyright Larry Diamond 2017 All Rights Reserved.
+*
+* Use of this source code is governed by an MIT-style license that can be
+* found in the LICENSE file at https://github.com/larrydiamond/typescriptcollectionsframework/LICENSE
+*/
+Object.defineProperty(exports, "__esModule", { value: true });
+var PriorityQueue = (function () {
+    function PriorityQueue() {
+    }
+    // A very talented volunteer stepped up to write PriorityQueue.   Im preparing some files for him.   Thank you very much!
+    /**
+    * Inserts the specified element into this queue if it is possible to do so immediately without violating capacity restrictions, returning true upon success
+    * and returning false if no space is currently available or if the implementation does not permit duplicates and already contains the specified element
+    */
+    PriorityQueue.prototype.add = function (k) {
+        return undefined;
+    };
+    /**
+    * Inserts the specified element into this queue if it is possible to do so immediately without violating capacity restrictions.
+    */
+    PriorityQueue.prototype.offer = function (k) {
+        return undefined;
+    };
+    /*
+    * Retrieves and removes the head of this queue, or returns null if this queue is empty.
+    */
+    PriorityQueue.prototype.poll = function () {
+        return undefined;
+    };
+    /*
+    * Retrieves and removes the head of this queue. This method differs from poll only in that it returns undefined if this queue is empty
+    */
+    PriorityQueue.prototype.removeQueue = function () {
+        return undefined;
+    };
+    /*
+    * Retrieves, but does not remove, the head of this queue, or returns null if this queue is empty.
+    */
+    PriorityQueue.prototype.peek = function () {
+        return undefined;
+    };
+    /*
+    * Retrieves, but does not remove, the head of this queue. This method differs from peek only in that it returns undefined if this queue is empty.
+    */
+    PriorityQueue.prototype.element = function () {
+        return undefined;
+    };
+    /**
+    * Removes all of the elements from this collection. The collection be empty after this call returns.
+    */
+    PriorityQueue.prototype.clear = function () {
+        ;
+    };
+    /**
+    * Removes the first occurrence of the specified element from this collection, if it is present. If the list does not contain the element, it is unchanged. More formally, removes the element with the lowest index i such that (o==null ? get(i)==null : o.equals(get(i))) (if such an element exists). Returns true if this list contained the specified element (or equivalently, if this list changed as a result of the call).
+    * @param {K} t element to be removed from this collection, if present
+    * @return {K} true if this collection contained the specified element
+    */
+    PriorityQueue.prototype.remove = function (k) {
+        return undefined;
+    };
+    /**
+    * Returns an ImmutableCollection backed by this Collection
+    */
+    PriorityQueue.prototype.immutableCollection = function () {
+        return this;
+    };
+    /**
+    * Returns the number of elements in this collection.
+    * @return {number} the number of elements in this collection
+    */
+    PriorityQueue.prototype.size = function () {
+        return undefined;
+    };
+    /**
+    * Returns true if this collection contains no elements.
+    * @return {boolean} true if this collection contains no elements
+    */
+    PriorityQueue.prototype.isEmpty = function () {
+        return undefined;
+    };
+    /**
+    * Returns a Java style iterator
+    * @return {JIterator<K>} the Java style iterator
+    */
+    PriorityQueue.prototype.iterator = function () {
+        return undefined;
+    };
+    /**
+     * Returns a TypeScript style iterator
+     * @return {Iterator<K>} the TypeScript style iterator
+     */
+    PriorityQueue.prototype[Symbol.iterator] = function () {
+        return undefined;
+    };
+    /**
+     * Returns true if this collection contains the specified element.
+     * @param {K} t element whose presence in this collection is to be tested
+     * @return {boolean} true if this collection contains the specified element
+     */
+    PriorityQueue.prototype.contains = function (k) {
+        return undefined;
+    };
+    return PriorityQueue;
+}());
+exports.PriorityQueue = PriorityQueue;
+
+
+/***/ },
+/* 630 */
 /***/ function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -81003,6 +81284,20 @@ var TreeSet = (function () {
     TreeSet.prototype[Symbol.iterator] = function () {
         return new TreeSetIterator(this);
     };
+    /**
+    * Returns an ImmutableCollection backed by this Collection
+    */
+    TreeSet.prototype.immutableCollection = function () {
+        return this;
+    };
+    ;
+    /**
+    * Returns an ImmutableSet backed by this Set
+    */
+    TreeSet.prototype.immutableSet = function () {
+        return this;
+    };
+    ;
     return TreeSet;
 }());
 exports.TreeSet = TreeSet;
@@ -81076,7 +81371,7 @@ exports.TreeSetIterator = TreeSetIterator;
 
 
 /***/ },
-/* 628 */
+/* 631 */
 /***/ function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, process) {/**
